@@ -483,47 +483,39 @@ code {
     margin-bottom: 1.5rem;
 }
 
-.case-data {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-    gap: 0;
-    border: 1px solid var(--border-light);
-    border-radius: 8px;
-    overflow: hidden;
-    background: var(--bg-warm);
+.case-bullets {
+    list-style: none;
+    padding: 0;
+    margin: 0;
 }
 
-.case-datum {
-    padding: 0.9rem 1.25rem;
-    border-bottom: 1px solid var(--border-light);
-    display: flex;
-    justify-content: space-between;
-    align-items: baseline;
-    gap: 1rem;
+.case-bullets li {
+    font-size: 0.92rem;
+    color: var(--text-secondary);
+    line-height: 1.7;
+    padding: 0.35rem 0;
+    padding-left: 1.25rem;
+    position: relative;
 }
 
-.case-datum:last-child,
-.case-datum:nth-last-child(2):nth-child(odd) {
-    border-bottom: none;
-}
-
-.case-datum dt {
-    font-size: 0.8rem;
+.case-bullets li::before {
+    content: '–';
+    position: absolute;
+    left: 0;
     color: var(--text-caption);
-    flex-shrink: 0;
 }
 
-.case-datum dd {
-    font-size: 0.85rem;
+.bullet-label {
     font-weight: 600;
-    text-align: right;
-    color: var(--text);
+    color: var(--text-muted);
+    font-size: 0.85rem;
 }
 
-.case-datum dd.highlight {
+.case-bullets .highlight {
     color: var(--green);
     font-family: var(--mono);
-    font-size: 0.82rem;
+    font-size: 0.88em;
+    font-weight: 700;
 }
 
 /* ---- Resources List ---- */
@@ -867,18 +859,6 @@ code {
         gap: 1rem;
     }
 
-    /* Case data */
-    .case-data {
-        grid-template-columns: 1fr;
-    }
-
-    .case-datum:nth-last-child(2):nth-child(odd) {
-        border-bottom: 1px solid var(--border-light);
-    }
-
-    .case-datum:last-child {
-        border-bottom: none;
-    }
 
     /* Team */
     .team-grid {
