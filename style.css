@@ -237,6 +237,15 @@ code {
     line-height: 0;
 }
 
+/* ---- Nav Controls (right-side group) ---- */
+.nav-controls {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    flex-shrink: 0;
+    margin-left: auto;
+}
+
 /* ---- Theme Toggle ---- */
 .theme-toggle {
     display: flex;
@@ -882,6 +891,7 @@ code {
     }
 
     .nav-links {
+        display: none;
         position: fixed;
         top: 60px;
         left: 0;
@@ -893,16 +903,17 @@ code {
         flex-direction: column;
         padding: 1rem;
         gap: 0.25rem;
-        transform: translateY(-110%);
-        transition: transform 0.3s var(--ease);
+        z-index: 99;
     }
 
     .nav-links.open {
-        transform: translateY(0);
+        display: flex;
     }
 
     .nav-toggle {
-        display: block;
+        display: flex;
+        align-items: center;
+        justify-content: center;
     }
 
     .hero {
