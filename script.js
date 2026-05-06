@@ -1,8 +1,47 @@
 /* ================================================================
-   Water DST — Light Mode Scripts
+   ReWater — Scripts (Theme, Scroll Reveal, Navigation)
    ================================================================ */
 (function () {
     'use strict';
+
+    /* ================================================================
+       Theme Toggle (dark / light)
+       ================================================================ */
+    const themeToggle = document.getElementById('theme-toggle');
+    const root = document.documentElement;
+
+    // Determine initial theme: saved preference → OS preference → light
+    function getInitialTheme() {
+        const saved = localStorage.getItem('rewater-theme');
+        if (saved === 'dark' || saved === 'light') return saved;
+        if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) return 'dark';
+        return 'light';
+    }
+
+    function applyTheme(theme) {
+        if (theme === 'dark') {
+            root.setAttribute('data-theme', 'dark');
+        } else {
+            root.removeAttribute('data-theme');
+        }
+        localStorage.setItem('rewater-theme', theme);
+    }
+
+    let currentTheme = getInitialTheme();
+    applyTheme(currentTheme);
+
+    themeToggle.addEventListener('click', () => {
+        currentTheme = currentTheme === 'light' ? 'dark' : 'light';
+        applyTheme(currentTheme);
+    });
+
+    // Respect OS changes while tab is open
+    window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (e) => {
+        if (!localStorage.getItem('rewater-theme')) {
+            currentTheme = e.matches ? 'dark' : 'light';
+            applyTheme(currentTheme);
+        }
+    });
 
     /* ================================================================
        Scroll Reveal

@@ -1,8 +1,8 @@
 /* ================================================================
-   Water DST — Light Mode, Research-Oriented Design
+   ReWater — Research-Oriented Design with Light/Dark Theme
    ================================================================ */
 
-/* ---- Design Tokens ---- */
+/* ---- Design Tokens (Light — default) ---- */
 :root {
     --bg: #faf9f6;
     --bg-warm: #f5f3ef;
@@ -20,8 +20,22 @@
     --accent-light: #e0f2fe;
     --accent-wash: rgba(14, 116, 144, 0.06);
 
+    --accent-border: rgba(14, 116, 144, 0.2);
+    --accent-border-hover: rgba(14, 116, 144, 0.35);
+    --accent-hover-bg: rgba(14, 116, 144, 0.1);
+    --accent-glow: rgba(14, 116, 144, 0.2);
+    --accent-glow-strong: rgba(14, 116, 144, 0.25);
+    --accent-symbol-border: rgba(14, 116, 144, 0.12);
+
     --green: #166534;
     --green-wash: rgba(22, 101, 52, 0.08);
+
+    --nav-bg: rgba(250, 249, 246, 0.85);
+    --nav-shadow: rgba(0, 0, 0, 0.06);
+    --hover-bg: rgba(0, 0, 0, 0.03);
+    --btn-ghost-hover-bg: rgba(0, 0, 0, 0.02);
+    --scrollbar-thumb: rgba(0, 0, 0, 0.12);
+    --scrollbar-thumb-hover: rgba(0, 0, 0, 0.2);
 
     --serif: 'Merriweather', Georgia, 'Times New Roman', serif;
     --sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
@@ -31,6 +45,46 @@
     --gutter: 2rem;
 
     --ease: cubic-bezier(0.25, 0.1, 0.25, 1);
+
+    color-scheme: light;
+}
+
+/* ---- Dark Theme ---- */
+[data-theme="dark"] {
+    --bg: #0f1117;
+    --bg-warm: #181a22;
+    --surface: #1e2029;
+    --border: #2a2d38;
+    --border-light: #23262f;
+
+    --text: #e4e4e8;
+    --text-secondary: #a8a9b4;
+    --text-muted: #6e7082;
+    --text-caption: #535560;
+
+    --accent: #22d3ee;
+    --accent-deep: #67e8f9;
+    --accent-light: rgba(34, 211, 238, 0.1);
+    --accent-wash: rgba(34, 211, 238, 0.07);
+
+    --accent-border: rgba(34, 211, 238, 0.2);
+    --accent-border-hover: rgba(34, 211, 238, 0.35);
+    --accent-hover-bg: rgba(34, 211, 238, 0.1);
+    --accent-glow: rgba(34, 211, 238, 0.15);
+    --accent-glow-strong: rgba(34, 211, 238, 0.2);
+    --accent-symbol-border: rgba(34, 211, 238, 0.15);
+
+    --green: #4ade80;
+    --green-wash: rgba(74, 222, 128, 0.08);
+
+    --nav-bg: rgba(15, 17, 23, 0.88);
+    --nav-shadow: rgba(0, 0, 0, 0.3);
+    --hover-bg: rgba(255, 255, 255, 0.04);
+    --btn-ghost-hover-bg: rgba(255, 255, 255, 0.04);
+    --scrollbar-thumb: rgba(255, 255, 255, 0.1);
+    --scrollbar-thumb-hover: rgba(255, 255, 255, 0.18);
+
+    color-scheme: dark;
 }
 
 /* ---- Reset ---- */
@@ -56,6 +110,7 @@ body {
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     overflow-x: hidden;
+    transition: background-color 0.35s var(--ease), color 0.35s var(--ease);
 }
 
 img {
@@ -93,15 +148,15 @@ code {
     align-items: center;
     justify-content: space-between;
     padding: 0 var(--gutter);
-    background: rgba(250, 249, 246, 0.85);
+    background: var(--nav-bg);
     backdrop-filter: blur(16px);
     -webkit-backdrop-filter: blur(16px);
     border-bottom: 1px solid var(--border-light);
-    transition: box-shadow 0.3s var(--ease);
+    transition: box-shadow 0.3s var(--ease), background-color 0.35s var(--ease);
 }
 
 .nav.scrolled {
-    box-shadow: 0 1px 12px rgba(0, 0, 0, 0.06);
+    box-shadow: 0 1px 12px var(--nav-shadow);
 }
 
 .nav-brand {
@@ -148,18 +203,18 @@ code {
 
 .nav-link:hover {
     color: var(--text);
-    background: rgba(0, 0, 0, 0.03);
+    background: var(--hover-bg);
 }
 
 .nav-link--primary {
     color: var(--accent);
-    border-color: rgba(14, 116, 144, 0.2);
+    border-color: var(--accent-border);
     background: var(--accent-wash);
 }
 
 .nav-link--primary:hover {
-    background: rgba(14, 116, 144, 0.1);
-    border-color: rgba(14, 116, 144, 0.35);
+    background: var(--accent-hover-bg);
+    border-color: var(--accent-border-hover);
     color: var(--accent-deep);
 }
 
@@ -180,6 +235,46 @@ code {
     cursor: pointer;
     padding: 0.25rem;
     line-height: 0;
+}
+
+/* ---- Theme Toggle ---- */
+.theme-toggle {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    border: 1px solid var(--border-light);
+    border-radius: 8px;
+    background: transparent;
+    color: var(--text-muted);
+    cursor: pointer;
+    transition: all 0.2s var(--ease);
+    flex-shrink: 0;
+}
+
+.theme-toggle:hover {
+    color: var(--text);
+    background: var(--hover-bg);
+    border-color: var(--border);
+}
+
+/* In light mode: show moon, hide sun */
+.theme-toggle .icon-sun {
+    display: none;
+}
+
+.theme-toggle .icon-moon {
+    display: block;
+}
+
+/* In dark mode: show sun, hide moon */
+[data-theme="dark"] .theme-toggle .icon-sun {
+    display: block;
+}
+
+[data-theme="dark"] .theme-toggle .icon-moon {
+    display: none;
 }
 
 /* ---- Hero ---- */
@@ -254,12 +349,12 @@ code {
 .btn-primary {
     background: var(--accent);
     color: #ffffff;
-    box-shadow: 0 1px 3px rgba(14, 116, 144, 0.2);
+    box-shadow: 0 1px 3px var(--accent-glow);
 }
 
 .btn-primary:hover {
     background: var(--accent-deep);
-    box-shadow: 0 4px 14px rgba(14, 116, 144, 0.25);
+    box-shadow: 0 4px 14px var(--accent-glow-strong);
     transform: translateY(-1px);
 }
 
@@ -272,7 +367,7 @@ code {
 .btn-ghost:hover {
     color: var(--text);
     border-color: var(--text-muted);
-    background: rgba(0, 0, 0, 0.02);
+    background: var(--btn-ghost-hover-bg);
 }
 
 .btn .arrow {
@@ -428,7 +523,7 @@ code {
     font-weight: 600;
     color: var(--accent);
     background: var(--accent-wash);
-    border: 1px solid rgba(14, 116, 144, 0.12);
+    border: 1px solid var(--accent-symbol-border);
     border-radius: 10px;
     margin-top: 0.15rem;
 }
@@ -765,12 +860,12 @@ code {
 }
 
 ::-webkit-scrollbar-thumb {
-    background: rgba(0, 0, 0, 0.12);
+    background: var(--scrollbar-thumb);
     border-radius: 3px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-    background: rgba(0, 0, 0, 0.2);
+    background: var(--scrollbar-thumb-hover);
 }
 
 /* ================================================================
@@ -791,7 +886,7 @@ code {
         top: 60px;
         left: 0;
         right: 0;
-        background: rgba(250, 249, 246, 0.97);
+        background: var(--nav-bg);
         backdrop-filter: blur(16px);
         -webkit-backdrop-filter: blur(16px);
         border-bottom: 1px solid var(--border);
