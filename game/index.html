@@ -1,0 +1,157 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="theme-color" content="#063b44" />
+    <title>Aqua Jokers: Treatment Tycoon</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <main class="app-shell">
+      <section class="top-bar" aria-label="Plant status">
+        <div>
+          <span class="label">EGP</span>
+          <strong id="money">0</strong>
+        </div>
+        <div>
+          <span class="label">Clean water</span>
+          <strong id="cleanWater">0 m3</strong>
+        </div>
+        <div>
+          <span class="label">Energy/sec</span>
+          <strong id="energyFooter">0</strong>
+        </div>
+      </section>
+
+      <section class="stage-band">
+        <div class="stage-copy">
+          <span id="stageKicker">Stage 1</span>
+          <h1 id="stageName">Booting plant...</h1>
+          <p id="stageGoal">Loading treatment goals.</p>
+        </div>
+        <button id="resetBtn" class="icon-button" type="button" aria-label="Reset save" title="Reset save">
+          <span aria-hidden="true">R</span>
+        </button>
+      </section>
+
+      <section class="quality-panel" aria-label="Water quality">
+        <div class="quality-header">
+          <span>Water Quality</span>
+          <strong id="qualityScore">0</strong>
+        </div>
+        <div class="quality-track">
+          <div id="qualityFill"></div>
+        </div>
+        <div class="quality-grid">
+          <div id="bodDial" class="dial-card">
+            <span>BOD</span>
+            <strong id="bod">0</strong>
+            <small id="bodStatus">Target 10</small>
+          </div>
+          <div id="tssDial" class="dial-card">
+            <span>TSS</span>
+            <strong id="tss">0</strong>
+            <small id="tssStatus">Target 10</small>
+          </div>
+          <div id="codDial" class="dial-card">
+            <span>COD</span>
+            <strong id="cod">0</strong>
+            <small id="codStatus">Target 50</small>
+          </div>
+          <div id="coliformDial" class="dial-card">
+            <span>Coliform</span>
+            <strong id="coliform">0</strong>
+            <small id="coliformStatus">Target 1K</small>
+          </div>
+        </div>
+      </section>
+
+      <section class="plant-zone" aria-label="Main treatment tap">
+        <button id="plantButton" class="plant-button" type="button">
+          <span class="plant-ripple"></span>
+          <span class="plant-core">
+            <span id="plantIcon" class="plant-icon">H2O</span>
+            <strong id="tapGain">+1</strong>
+            <small>tap to treat</small>
+          </span>
+        </button>
+        <div id="floatLayer" class="float-layer" aria-hidden="true"></div>
+      </section>
+
+      <section class="ai-panel" aria-label="DST assistant">
+        <div class="ai-avatar">AI</div>
+        <div>
+          <span>DST Assistant</span>
+          <p id="aiTip">I will watch the bottlenecks and nudge you toward better upgrades.</p>
+        </div>
+      </section>
+
+      <section class="meter-row" aria-label="Economy">
+        <div>
+          <span>Gross/sec</span>
+          <strong id="incomeRate">0</strong>
+        </div>
+        <div>
+          <span>Energy cost/sec</span>
+          <strong id="energyCost">0</strong>
+        </div>
+        <div>
+          <span>Profit/sec</span>
+          <strong id="profitRate">0</strong>
+        </div>
+      </section>
+
+      <nav class="tabs" aria-label="Game sections">
+        <button class="tab active" data-tab="upgrades" type="button">Upgrades</button>
+        <button class="tab" data-tab="stages" type="button">Stages</button>
+        <button class="tab" data-tab="stats" type="button">Stats</button>
+      </nav>
+
+      <section id="upgradesView" class="view active" aria-label="Upgrade shop">
+        <div id="upgradeList" class="upgrade-list"></div>
+      </section>
+
+      <section id="stagesView" class="view" aria-label="Stage progress">
+        <div id="stageList" class="stage-list"></div>
+      </section>
+
+      <section id="statsView" class="view" aria-label="Detailed statistics">
+        <div class="stat-card">
+          <span>Total water processed</span>
+          <strong id="totalProcessed">0 m3</strong>
+        </div>
+        <div class="stat-card">
+          <span>Grade A readiness</span>
+          <strong id="gradeReadiness">0%</strong>
+        </div>
+        <div class="stat-card">
+          <span>Current plant power</span>
+          <strong id="powerLevel">1x</strong>
+        </div>
+        <div class="stat-card">
+          <span>Best bottleneck</span>
+          <strong id="bottleneck">Loading</strong>
+        </div>
+      </section>
+    </main>
+
+    <div id="effectsLayer" class="effects-layer" aria-hidden="true"></div>
+
+    <section id="victoryModal" class="victory-modal" aria-hidden="true">
+      <div class="victory-card" role="dialog" aria-modal="true" aria-labelledby="victoryTitle">
+        <span id="victoryKicker">Stage cleared</span>
+        <h2 id="victoryTitle">Plant optimized</h2>
+        <p id="victoryText">Your upgrade strategy reached the target quality.</p>
+        <div class="victory-stats">
+          <div><span>Quality</span><strong id="victoryQuality">0</strong></div>
+          <div><span>Energy</span><strong id="victoryEnergy">0/s</strong></div>
+          <div><span>Reward</span><strong id="victoryReward">EGP 0</strong></div>
+        </div>
+        <button id="continueBtn" class="continue-button" type="button">Continue</button>
+      </div>
+    </section>
+
+    <script src="game.js"></script>
+  </body>
+</html>
