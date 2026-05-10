@@ -18,8 +18,8 @@ const STAGES = [
     reward_money: 250,
     bod: 180,
     tss: 120,
-    cod: 260,
-    coliform: 900000
+    cod: 50,
+    coliform: 1000
   },
   {
     id: "zenin",
@@ -31,7 +31,7 @@ const STAGES = [
     reward_money: 1800,
     bod: 15.7,
     tss: 15,
-    cod: 52,
+    cod: 50,
     coliform: 710000
   },
   {
@@ -115,6 +115,23 @@ const UPGRADES = [
     unlock_stage: "tutorial"
   },
   {
+    id: "hydro_gen",
+    name: "Micro-Hydro Turbine",
+    icon: "pump",
+    description: "Generates clean income and cuts energy costs using water flow.",
+    base_cost: 140,
+    cost_mult: 1.17,
+    tap_gain: 0,
+    income_gain: 1.5,
+    bod_reduction: 0,
+    tss_reduction: 0,
+    cod_reduction: 0,
+    coliform_reduction: 0,
+    energy_cost: 0,
+    energy_recovery: 0.35,
+    unlock_stage: "tutorial"
+  },
+  {
     id: "screens",
     name: "Inlet Screens",
     icon: "screens",
@@ -123,6 +140,7 @@ const UPGRADES = [
     cost_mult: 1.18,
     tap_gain: 0,
     income_gain: 0,
+    water_gain: 0.8,
     bod_reduction: 0,
     tss_reduction: 18,
     cod_reduction: 0,
@@ -140,6 +158,7 @@ const UPGRADES = [
     cost_mult: 1.19,
     tap_gain: 0,
     income_gain: 0,
+    water_gain: 1.5,
     bod_reduction: 30,
     tss_reduction: 0,
     cod_reduction: 0,
@@ -157,6 +176,7 @@ const UPGRADES = [
     cost_mult: 1.21,
     tap_gain: 0,
     income_gain: 0,
+    water_gain: 2.5,
     bod_reduction: 0,
     tss_reduction: 0,
     cod_reduction: 0,
@@ -174,6 +194,7 @@ const UPGRADES = [
     cost_mult: 1.19,
     tap_gain: 0,
     income_gain: 0,
+    water_gain: 1.2,
     bod_reduction: 0,
     tss_reduction: 24,
     cod_reduction: 0,
@@ -208,6 +229,7 @@ const UPGRADES = [
     cost_mult: 1.23,
     tap_gain: 0,
     income_gain: 0,
+    water_gain: 4.0,
     bod_reduction: 0,
     tss_reduction: 0,
     cod_reduction: 35,
@@ -225,6 +247,7 @@ const UPGRADES = [
     cost_mult: 1.25,
     tap_gain: 0,
     income_gain: 0,
+    water_gain: 8.5,
     bod_reduction: 0,
     tss_reduction: 20,
     cod_reduction: 0,
@@ -287,7 +310,7 @@ const ICONS = {
 const els = {
   money: document.querySelector("#money"),
   cleanWater: document.querySelector("#cleanWater"),
-  energyFooter: document.querySelector("#energyFooter"),
+  profitFooter: document.querySelector("#profitFooter"),
   stageKicker: document.querySelector("#stageKicker"),
   stageName: document.querySelector("#stageName"),
   stageGoal: document.querySelector("#stageGoal"),
@@ -319,6 +342,9 @@ const els = {
   powerLevel: document.querySelector("#powerLevel"),
   bottleneck: document.querySelector("#bottleneck"),
   resetBtn: document.querySelector("#resetBtn"),
+  toggleMusicBtn: document.querySelector("#toggleMusicBtn"),
+  toggleSoundBtn: document.querySelector("#toggleSoundBtn"),
+  bgm: document.querySelector("#bgm"),
   effectsLayer: document.querySelector("#effectsLayer"),
   victoryModal: document.querySelector("#victoryModal"),
   victoryKicker: document.querySelector("#victoryKicker"),
@@ -351,7 +377,8 @@ let currentRecommendedUpgradeId = "";
 
 const audio = {
   ctx: null,
-  enabled: false,
+  soundEnabled: true,
+  musicEnabled: true,
   unlock() {
     if (!this.ctx) {
       const AudioContext = window.AudioContext || window.webkitAudioContext;
@@ -359,10 +386,29 @@ const audio = {
       this.ctx = new AudioContext();
     }
     if (this.ctx.state === "suspended") this.ctx.resume();
-    this.enabled = true;
+    
+    if (this.musicEnabled && els.bgm.paused) {
+      els.bgm.volume = 0.1;
+      els.bgm.play().catch(() => {});
+    }
+  },
+  toggleMusic() {
+    this.musicEnabled = !this.musicEnabled;
+    if (this.musicEnabled) {
+      els.bgm.volume = 0.1;
+      els.bgm.play().catch(e => console.error("BGM error:", e));
+      els.toggleMusicBtn.querySelector("span").textContent = "🎵";
+    } else {
+      els.bgm.pause();
+      els.toggleMusicBtn.querySelector("span").textContent = "🔇";
+    }
+  },
+  toggleSound() {
+    this.soundEnabled = !this.soundEnabled;
+    els.toggleSoundBtn.querySelector("span").textContent = this.soundEnabled ? "🔊" : "🔈";
   },
   tone(freq, duration = 0.08, type = "sine", gain = 0.035, detune = 0) {
-    if (!this.enabled || !this.ctx) return;
+    if (!this.soundEnabled || !this.ctx) return;
     const now = this.ctx.currentTime;
     const osc = this.ctx.createOscillator();
     const amp = this.ctx.createGain();
@@ -378,7 +424,7 @@ const audio = {
     osc.stop(now + duration + 0.03);
   },
   sweep(from, to, duration = 0.16, type = "triangle", gain = 0.045) {
-    if (!this.enabled || !this.ctx) return;
+    if (!this.soundEnabled || !this.ctx) return;
     const now = this.ctx.currentTime;
     const osc = this.ctx.createOscillator();
     const amp = this.ctx.createGain();
@@ -425,6 +471,13 @@ const audio = {
 function boot() {
   loadSave();
   bindEvents();
+
+  if (audio.musicEnabled) {
+    els.bgm.volume = 0.1;
+    els.bgm.play().catch(() => {});
+    els.toggleMusicBtn.querySelector("span").textContent = "🎵";
+  }
+
   render();
   renderVictory();
   setInterval(tick, 1000);
@@ -435,6 +488,16 @@ function bindEvents() {
   els.plantButton.addEventListener("pointerdown", (event) => {
     audio.unlock();
     treatWater(event);
+  });
+
+  els.toggleMusicBtn.addEventListener("click", () => {
+    audio.unlock();
+    audio.toggleMusic();
+  });
+
+  els.toggleSoundBtn.addEventListener("click", () => {
+    audio.unlock();
+    audio.toggleSound();
   });
 
   document.querySelectorAll(".tab").forEach((tab) => {
@@ -482,7 +545,8 @@ function treatWater(event) {
 
   audio.tap(metrics.tapGain);
   els.plantButton.classList.remove("popping");
-  requestAnimationFrame(() => els.plantButton.classList.add("popping"));
+  void els.plantButton.offsetWidth; // Force reflow to restart CSS animation
+  els.plantButton.classList.add("popping");
   addFloater(event, `+${formatNumber(gain)} m3`);
   burstAtEvent(event, ["#65d9f2", "#7cf2a7"], 9);
   moneyPop(event.clientX, event.clientY - 16, `+${formatMoney(gain * metrics.tapValue)}`);
@@ -520,17 +584,25 @@ function tick() {
 
 function getMetrics() {
   const stage = stages[state.stageIndex] || stages[0];
+  const waterScale = 1 + (state.cleanWater / 2000);
+
   const totals = upgrades.reduce((acc, upgrade) => {
     const owned = state.upgrades[upgrade.id] || 0;
     const effect = owned * Math.pow(1.035, Math.max(0, owned - 1));
     acc.tapGain += upgrade.tap_gain * owned;
-    acc.incomeRate += upgrade.income_gain * owned * Math.pow(1.04, owned);
+    
+    const scaledIncome = (upgrade.income_gain || 0) * (upgrade.income_gain > 0 ? waterScale : 1);
+    acc.incomeRate += scaledIncome * owned * Math.pow(1.04, owned);
+    
     acc.bodReduction += upgrade.bod_reduction * effect;
     acc.tssReduction += upgrade.tss_reduction * effect;
     acc.codReduction += upgrade.cod_reduction * effect;
     acc.coliformReduction += upgrade.coliform_reduction * effect;
     acc.energyCost += upgrade.energy_cost * owned * Math.pow(1.03, owned);
     acc.energyRecovery += upgrade.energy_recovery * owned * Math.pow(1.04, owned);
+    
+    acc.passiveWaterBoost += (upgrade.water_gain || 0) * owned * Math.pow(1.03, owned);
+
     return acc;
   }, {
     tapGain: 1,
@@ -540,7 +612,8 @@ function getMetrics() {
     codReduction: 0,
     coliformReduction: 0,
     energyCost: 0,
-    energyRecovery: 0
+    energyRecovery: 0,
+    passiveWaterBoost: 0
   });
 
   const bod = Math.max(2, stage.bod * Math.exp(-totals.bodReduction / 95));
@@ -558,7 +631,7 @@ function getMetrics() {
   const incomeRate = totals.incomeRate * (0.7 + quality / 115);
   const tapValue = 0.75 + quality / 52;
   const netProfit = incomeRate - energyCost;
-  const passiveWater = 0.35 + incomeRate * 0.7;
+  const passiveWater = 0.35 + incomeRate * 0.7 + totals.passiveWaterBoost;
 
   return {
     ...totals,
@@ -674,7 +747,7 @@ function checkGoalMilestones(metrics) {
   if (changed) state.goalMarks[key] = marks;
 }
 
-function buyUpgrade(id) {
+function buyUpgrade(id, event) {
   if (state.victory) return;
   const upgrade = upgrades.find((item) => item.id === id);
   if (!upgrade) return;
@@ -685,9 +758,16 @@ function buyUpgrade(id) {
   state.upgrades[id] = (state.upgrades[id] || 0) + 1;
   state.tipCooldown = 0;
   audio.upgrade();
-  addCenterFloater(`${upgrade.name} +1`);
-  const rect = els.upgradeList.getBoundingClientRect();
-  burstWindow(rect.left + rect.width / 2, Math.max(110, rect.top + 40), ["#ffd166", "#7cf2a7"], 20);
+  
+  if (event) {
+    addFloater(event, `${upgrade.name} +1`);
+    burstAtEvent(event, ["#ffd166", "#7cf2a7"], 20);
+  } else {
+    addCenterFloater(`${upgrade.name} +1`);
+    const rect = els.upgradeList.getBoundingClientRect();
+    burstWindow(rect.left + rect.width / 2, Math.max(110, rect.top + 40), ["#ffd166", "#7cf2a7"], 20);
+  }
+
   checkGoalMilestones(getMetrics());
   checkStageCompletion();
   render();
@@ -713,7 +793,7 @@ function render() {
 
   els.money.textContent = formatMoney(state.money);
   els.cleanWater.textContent = `${formatNumber(state.cleanWater)} m3`;
-  els.energyFooter.textContent = `${formatMoney(metrics.energyCost)}/s`;
+  els.profitFooter.textContent = `${formatMoney(metrics.netProfit)}/s`;
   els.stageKicker.textContent = stage.kicker;
   els.stageName.textContent = stage.name;
   els.stageGoal.textContent = `${stage.description} Win by passing all four pollutant dials while keeping energy under ${formatMoney(stage.target_energy)}/s.`;
@@ -749,8 +829,12 @@ function renderUpgrades(metrics) {
     const unlocked = isUpgradeUnlocked(upgrade);
     const cost = getUpgradeCost(upgrade);
     const owned = state.upgrades[upgrade.id] || 0;
+    
+    const isRecommended = upgrade.id === currentRecommendedUpgradeId || 
+                          (currentRecommendedUpgradeId === "energy" && ["hydro_gen", "digester", "solar"].includes(upgrade.id));
+                          
     const button = document.createElement("button");
-    button.className = `upgrade-card ${state.money >= cost && unlocked ? "affordable" : ""} ${upgrade.id === currentRecommendedUpgradeId ? "recommended" : ""}`;
+    button.className = `upgrade-card ${state.money >= cost && unlocked ? "affordable" : ""} ${isRecommended ? "recommended" : ""}`;
     button.disabled = !unlocked || state.money < cost;
     button.type = "button";
     button.innerHTML = `
@@ -767,7 +851,7 @@ function renderUpgrades(metrics) {
         <span class="owned">Owned ${owned}</span>
       </div>
     `;
-    button.addEventListener("click", () => buyUpgrade(upgrade.id));
+    button.addEventListener("click", (event) => buyUpgrade(upgrade.id, event));
     els.upgradeList.append(button);
   });
 }
@@ -779,7 +863,21 @@ function renderDial(key, check, unit) {
 
   dial.classList.toggle("pass", check.pass);
   dial.classList.toggle("fail", !check.pass);
-  dial.style.setProperty("--dial", `${Math.floor(check.badness * 100)}%`);
+  
+  let angle = 0;
+  if (check.value <= check.target) {
+    const v = Math.max(0, check.value) / check.target;
+    angle = -90 + (v * 90);
+  } else {
+    const logRatio = Math.log10(check.value / check.target);
+    angle = Math.min(90, (logRatio / 3) * 90);
+  }
+  
+  const needleGroup = dial.querySelector('.dial-needle-group');
+  if (needleGroup) {
+    needleGroup.style.transform = `rotate(${angle}deg)`;
+  }
+  
   status.textContent = check.pass
     ? `Under ${formatTarget(check.target)} ${unit}`
     : `Over ${formatTarget(check.target)} ${unit}`;
@@ -853,7 +951,7 @@ function renderTip(metrics, bottleneck) {
     tip = `${bottleneck.label} is holding quality back. Buy ${bestUpgrade.name} next (${formatMoney(cost)}) for the strongest push.`;
     recommendationId = bestUpgrade.id;
   } else if (!compliance.energy.pass) {
-    tip = "The water is clean, but energy cost is too high. Buy Sludge Digester or Solar Field to cut the bill.";
+    tip = "The water is clean, but energy cost is too high. Buy Micro-Hydro Turbine, Sludge Digester, or Solar Field to cut the bill.";
     recommendationId = "energy";
   } else {
     tip = "All pass checks are green. The plant is ready to clear.";
@@ -861,7 +959,7 @@ function renderTip(metrics, bottleneck) {
   }
 
   els.aiTip.textContent = tip;
-  currentRecommendedUpgradeId = bestUpgrade ? bestUpgrade.id : "";
+  currentRecommendedUpgradeId = bestUpgrade ? bestUpgrade.id : (recommendationId === "energy" ? "energy" : "");
   if (state.lastRecommendationId && state.lastRecommendationId !== recommendationId) {
     audio.tip();
     const rect = els.aiTip.getBoundingClientRect();

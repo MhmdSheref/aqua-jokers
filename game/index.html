@@ -5,6 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
     <meta name="theme-color" content="#063b44" />
     <title>Aqua Jokers: Treatment Tycoon</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="styles.css" />
   </head>
   <body>
@@ -19,8 +22,8 @@
           <strong id="cleanWater">0 m3</strong>
         </div>
         <div>
-          <span class="label">Energy/sec</span>
-          <strong id="energyFooter">0</strong>
+          <span class="label">Profit/s</span>
+          <strong id="profitFooter">0</strong>
         </div>
       </section>
 
@@ -30,10 +33,20 @@
           <h1 id="stageName">Booting plant...</h1>
           <p id="stageGoal">Loading treatment goals.</p>
         </div>
-        <button id="resetBtn" class="icon-button" type="button" aria-label="Reset save" title="Reset save">
-          <span aria-hidden="true">R</span>
-        </button>
+        <div style="display: flex; gap: 8px;">
+          <button id="toggleMusicBtn" class="icon-button" type="button" aria-label="Toggle Music" title="Toggle Music">
+            <span aria-hidden="true">🎵</span>
+          </button>
+          <button id="toggleSoundBtn" class="icon-button" type="button" aria-label="Toggle Sound" title="Toggle Sound">
+            <span aria-hidden="true">🔊</span>
+          </button>
+          <button id="resetBtn" class="icon-button" type="button" aria-label="Reset save" title="Reset save">
+            <span aria-hidden="true">R</span>
+          </button>
+        </div>
       </section>
+
+      <audio id="bgm" loop src="bgm.mp3" preload="auto"></audio>
 
       <section class="quality-panel" aria-label="Water quality">
         <div class="quality-header">
@@ -45,24 +58,68 @@
         </div>
         <div class="quality-grid">
           <div id="bodDial" class="dial-card">
-            <span>BOD</span>
-            <strong id="bod">0</strong>
-            <small id="bodStatus">Target 10</small>
+            <svg viewBox="0 0 100 55" class="dial-svg">
+              <path class="dial-track" d="M 10 50 A 40 40 0 0 1 90 50" />
+              <path class="dial-pass-track" d="M 10 50 A 40 40 0 0 1 50 10" />
+              <line class="dial-target-line" x1="50" y1="2" x2="50" y2="16" />
+              <g class="dial-needle-group">
+                <polygon points="48,50 52,50 50,10" class="dial-needle" />
+                <circle cx="50" cy="50" r="4" class="dial-pivot" />
+              </g>
+            </svg>
+            <div class="dial-content">
+              <span>BOD</span>
+              <strong id="bod">0</strong>
+              <small id="bodStatus">Target 10</small>
+            </div>
           </div>
           <div id="tssDial" class="dial-card">
-            <span>TSS</span>
-            <strong id="tss">0</strong>
-            <small id="tssStatus">Target 10</small>
+            <svg viewBox="0 0 100 55" class="dial-svg">
+              <path class="dial-track" d="M 10 50 A 40 40 0 0 1 90 50" />
+              <path class="dial-pass-track" d="M 10 50 A 40 40 0 0 1 50 10" />
+              <line class="dial-target-line" x1="50" y1="2" x2="50" y2="16" />
+              <g class="dial-needle-group">
+                <polygon points="48,50 52,50 50,10" class="dial-needle" />
+                <circle cx="50" cy="50" r="4" class="dial-pivot" />
+              </g>
+            </svg>
+            <div class="dial-content">
+              <span>TSS</span>
+              <strong id="tss">0</strong>
+              <small id="tssStatus">Target 10</small>
+            </div>
           </div>
           <div id="codDial" class="dial-card">
-            <span>COD</span>
-            <strong id="cod">0</strong>
-            <small id="codStatus">Target 50</small>
+            <svg viewBox="0 0 100 55" class="dial-svg">
+              <path class="dial-track" d="M 10 50 A 40 40 0 0 1 90 50" />
+              <path class="dial-pass-track" d="M 10 50 A 40 40 0 0 1 50 10" />
+              <line class="dial-target-line" x1="50" y1="2" x2="50" y2="16" />
+              <g class="dial-needle-group">
+                <polygon points="48,50 52,50 50,10" class="dial-needle" />
+                <circle cx="50" cy="50" r="4" class="dial-pivot" />
+              </g>
+            </svg>
+            <div class="dial-content">
+              <span>COD</span>
+              <strong id="cod">0</strong>
+              <small id="codStatus">Target 50</small>
+            </div>
           </div>
           <div id="coliformDial" class="dial-card">
-            <span>Coliform</span>
-            <strong id="coliform">0</strong>
-            <small id="coliformStatus">Target 1K</small>
+            <svg viewBox="0 0 100 55" class="dial-svg">
+              <path class="dial-track" d="M 10 50 A 40 40 0 0 1 90 50" />
+              <path class="dial-pass-track" d="M 10 50 A 40 40 0 0 1 50 10" />
+              <line class="dial-target-line" x1="50" y1="2" x2="50" y2="16" />
+              <g class="dial-needle-group">
+                <polygon points="48,50 52,50 50,10" class="dial-needle" />
+                <circle cx="50" cy="50" r="4" class="dial-pivot" />
+              </g>
+            </svg>
+            <div class="dial-content">
+              <span>Coliform</span>
+              <strong id="coliform">0</strong>
+              <small id="coliformStatus">Target 1K</small>
+            </div>
           </div>
         </div>
       </section>
@@ -79,10 +136,10 @@
         <div id="floatLayer" class="float-layer" aria-hidden="true"></div>
       </section>
 
-      <section class="ai-panel" aria-label="DST assistant">
-        <div class="ai-avatar">AI</div>
+      <section class="ai-panel" aria-label="Ducky.AI assistant">
+        <img class="ai-avatar" src="ducky.png" alt="Ducky.AI" />
         <div>
-          <span>DST Assistant</span>
+          <span>Ducky.AI</span>
           <p id="aiTip">I will watch the bottlenecks and nudge you toward better upgrades.</p>
         </div>
       </section>
@@ -93,12 +150,12 @@
           <strong id="incomeRate">0</strong>
         </div>
         <div>
-          <span>Energy cost/sec</span>
-          <strong id="energyCost">0</strong>
+          <span>Profit/sec</span>
+          <strong id="profitRate" style="color: var(--green);">0</strong>
         </div>
         <div>
-          <span>Profit/sec</span>
-          <strong id="profitRate">0</strong>
+          <span>Energy cost/sec</span>
+          <strong id="energyCost" style="color: var(--danger);">0</strong>
         </div>
       </section>
 
